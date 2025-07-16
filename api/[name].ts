@@ -1,5 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { generateXmlContent, setXmlHeaders } from '../src/utils/xmlGenerator.js'
+
+// 공통 XML 생성 함수 (Vercel 환경에서는 직접 포함)
+function generateXmlContent(name: string): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <n>${name}</n>
+  <timestamp>${new Date().toISOString()}</timestamp>
+  <status>active</status>
+</config>`
+}
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   const { name } = req.query
@@ -8,8 +17,9 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Name parameter is required' })
   }
   
-  // 공통 함수 사용
   const xmlContent = generateXmlContent(name)
-  setXmlHeaders(res)
+  
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+  res.setHeader('Cache-Control', 'no-cache')
   res.status(200).send(xmlContent)
 } 
