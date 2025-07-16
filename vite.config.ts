@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { generateXmlContent, setXmlHeaders } from './src/utils/xmlGenerator.js'
 
-// XML 응답을 위한 커스텀 플러그인
+// 개발환경용 XML 응답 플러그인 (배포환경과 동일한 로직 사용)
 function xmlResponsePlugin() {
   return {
     name: 'xml-response',
@@ -14,13 +15,10 @@ function xmlResponsePlugin() {
         
         if (xmlMatch) {
           const name = xmlMatch[1]
-          const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-<config>
-  ${name}
-</config>`
           
-          res.setHeader('Content-Type', 'application/xml; charset=utf-8')
-          res.setHeader('Cache-Control', 'no-cache')
+          // API와 동일한 XML 생성 로직 사용
+          const xmlContent = generateXmlContent(name)
+          setXmlHeaders(res)
           res.end(xmlContent)
           return
         }
